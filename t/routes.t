@@ -5,7 +5,13 @@ use File::Spec;
 use Dancer qw/:tests !after/;
 use Dancer::Plugin::DBIC;
 
+use strict;
+use warnings;
+
 use lib File::Spec->catdir( 't', 'lib' );
+
+use TableEdit;
+use Dancer::Test;
 
 set logger => "console";
 set log => "debug";
@@ -23,13 +29,7 @@ set plugins => {
     }
 };
 
-use TableEdit;
-use Dancer::Test;
-
-use strict;
-use warnings;
-
-my ( $schema, $rset, $result );
+my ( $schema, $rset, $resp );
 
 lives_ok( sub { $schema = schema }, "get schema" );
 
@@ -37,6 +37,8 @@ lives_ok( sub { $schema->deploy() }, "deploy" );
 lives_ok( sub { $rset = $schema->resultset('Cd') }, "get Cd resultset" );
 
 cmp_ok( $rset->count, '>', 0, "num Cds: " . $rset->count );
+
+lives_ok( sub { $resp = dancer_response GET => "/" }, "GET /" );
 
 done_testing;
 
